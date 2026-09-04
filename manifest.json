@@ -1,0 +1,8 @@
+{
+  "name": "AI员工管家 V5.0",
+  "short_name": "AI管家 V5",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#111827"
+}
