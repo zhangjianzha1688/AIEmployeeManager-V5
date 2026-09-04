@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#111827">
+<link rel="manifest" href="manifest.json">
+<title>AI员工管家 V5.0</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f4f6f8;color:#111827}
+.app{max-width:520px;margin:auto;min-height:100vh;background:#fff;display:flex;flex-direction:column}
+header{background:#111827;color:white;padding:18px 16px}header h1{margin:0;font-size:20px}header p{margin:5px 0 0;font-size:13px;opacity:.75}
+main{flex:1;padding:16px 16px 90px}.page{display:none}.page.active{display:block}
+.card{border:1px solid #e5e7eb;border-radius:16px;padding:16px;margin-bottom:12px;background:white}
+.row{display:flex;gap:12px;align-items:center}.emoji{font-size:30px}.muted{color:#6b7280;font-size:13px}
+.bubble{max-width:84%;padding:11px 13px;border-radius:16px;margin:8px 0;font-size:15px}
+.bot{background:#f3f4f6}.me{background:#dff7d8;margin-left:auto}
+.input{display:flex;gap:8px;margin-top:12px}.input input{flex:1;min-width:0;padding:12px;border:1px solid #d1d5db;border-radius:12px;font-size:16px}.input button{border:0;background:#111827;color:#fff;border-radius:12px;padding:0 16px}
+.quick{display:grid;grid-template-columns:1fr 1fr;gap:10px}.quick button,.action{border:1px solid #e5e7eb;background:#fff;border-radius:14px;padding:14px;font-size:15px;text-align:left}
+nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(520px,100%);display:grid;grid-template-columns:repeat(5,1fr);background:white;border-top:1px solid #e5e7eb}
+nav button{border:0;background:white;padding:9px 2px 10px;font-size:12px;color:#6b7280}nav button.active{color:#111827;font-weight:bold}nav span{display:block;font-size:21px}
+</style>
+</head>
+<body>
+<div class="app">
+<header><h1>🤖 AI员工管家 V5.0</h1><p>微信式操作界面 · 第一版</p></header>
+<main>
+<section id="manager" class="page active">
+<div class="card">
+<div class="row"><div class="emoji">🧠</div><div><b>AI总管</b><div class="muted">接收指令并分配给AI员工</div></div></div>
+<div id="chat"><div class="bubble bot">老板，我在。今天想让我安排什么任务？</div></div>
+<div class="input"><input id="msg" placeholder="输入任务"><button id="send">发送</button></div>
+</div>
+<div class="quick">
+<button data-q="帮我安排今天的任务">📋 安排任务</button>
+<button data-q="整理今天的收入和支出">💰 检查财务</button>
+<button data-q="生成一个旅游短视频任务">🎬 内容赚钱</button>
+<button data-q="检查自动化任务">⚙️ 自动化</button>
+</div>
+</section>
+
+<section id="messages" class="page">
+<div class="card row"><div class="emoji">💰</div><div><b>AI会计师</b><div class="muted">2笔支出等待分类</div></div></div>
+<div class="card row"><div class="emoji">🎧</div><div><b>AI客服</b><div class="muted">暂无待处理消息</div></div></div>
+<div class="card row"><div class="emoji">🌍</div><div><b>AI翻译</b><div class="muted">中 / 意 / 英</div></div></div>
+</section>
+
+<section id="tasks" class="page">
+<div class="card"><b>整理今日收入支出</b><div class="muted">负责人：AI会计师 · 进行中</div></div>
+<div class="card"><b>生成旅游短视频文案</b><div class="muted">负责人：AI内容员工 · 待处理</div></div>
+<button id="addtask" class="action">＋ 新建测试任务</button><div id="tasklist"></div>
+</section>
+
+<section id="employees" class="page">
+<div class="card row"><div class="emoji">💰</div><div><b>AI会计师</b><div class="muted">在线</div></div></div>
+<div class="card row"><div class="emoji">🎧</div><div><b>AI客服</b><div class="muted">在线</div></div></div>
+<div class="card row"><div class="emoji">🌍</div><div><b>AI翻译</b><div class="muted">待接入</div></div></div>
+<div class="card row"><div class="emoji">🎬</div><div><b>AI内容员工</b><div class="muted">在线</div></div></div>
+</section>
+
+<section id="me" class="page">
+<div class="card"><b>我的系统</b><p>版本：V5.0</p><p>模式：PWA 原型</p><p id="backupstate">备份状态：今日未备份</p><button id="backup" class="action">💾 立即备份</button></div>
+</section>
+</main>
+
+<nav>
+<button class="tab active" data-page="manager"><span>🧠</span>总管</button>
+<button class="tab" data-page="messages"><span>💬</span>消息</button>
+<button class="tab" data-page="tasks"><span>📋</span>任务</button>
+<button class="tab" data-page="employees"><span>👥</span>AI员工</button>
+<button class="tab" data-page="me"><span>👤</span>我的</button>
+</nav>
+</div>
+<script>
+const pages=[...document.querySelectorAll('.page')],tabs=[...document.querySelectorAll('.tab')];
+tabs.forEach(t=>t.onclick=()=>{pages.forEach(p=>p.classList.toggle('active',p.id===t.dataset.page));tabs.forEach(x=>x.classList.toggle('active',x===t));});
+function send(text){text=(text||'').trim();if(!text)return;const c=document.getElementById('chat');const u=document.createElement('div');u.className='bubble me';u.textContent=text;c.appendChild(u);const b=document.createElement('div');b.className='bubble bot';b.textContent='收到。正式版会把这个任务交给对应AI员工执行。';c.appendChild(b);}
+document.getElementById('send').onclick=()=>{const i=document.getElementById('msg');send(i.value);i.value='';};
+document.querySelectorAll('[data-q]').forEach(b=>b.onclick=()=>send(b.dataset.q));
+document.getElementById('addtask').onclick=()=>document.getElementById('tasklist').insertAdjacentHTML('beforeend','<div class="card"><b>新建测试任务</b><div class="muted">负责人：AI总管 · 待处理</div></div>');
+document.getElementById('backup').onclick=()=>document.getElementById('backupstate').textContent='备份状态：刚刚已备份 ✓';
+if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+</body>
+</html>
